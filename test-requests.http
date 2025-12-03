@@ -129,7 +129,7 @@ Content-Type: application/json
 }
 
 ### Adicionar outro Comentário
-POST {{baseUrl}}/tasks/1/comments
+POST {{baseUrl}}/tasks/3/comments
 Content-Type: application/json
 
 {
@@ -138,7 +138,7 @@ Content-Type: application/json
 }
 
 ### Listar Comentários de uma Tarefa
-GET {{baseUrl}}/tasks/1/comments
+GET {{baseUrl}}/tasks/3/comments
 
 ### Deletar Comentário
 DELETE {{baseUrl}}/tasks/1/comments/1
