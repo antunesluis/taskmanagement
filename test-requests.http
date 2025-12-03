@@ -1,0 +1,246 @@
+### Task Manager API - Test Requests
+### Use no IntelliJ IDEA ou VS Code com extensão REST Client
+
+@baseUrl = http://localhost:8080/api
+
+### ==================== PROJETOS ====================
+
+### Criar Projeto
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "name": "Website Redesign",
+  "description": "Redesenhar o site corporativo com nova identidade visual"
+}
+
+### Listar todos os Projetos
+GET {{baseUrl}}/projects
+
+### Buscar Projeto por ID
+GET {{baseUrl}}/projects/1
+
+### Buscar Projetos por Nome
+GET {{baseUrl}}/projects/search?name=Website
+
+### Atualizar Projeto
+PUT {{baseUrl}}/projects/2
+Content-Type: application/json
+
+{
+  "name": "Website Redesign - Fase 2",
+  "description": "Segunda fase do redesign incluindo área de membros"
+}
+
+### Deletar Projeto
+DELETE {{baseUrl}}/projects/1
+
+
+### ==================== TAREFAS ====================
+
+### Criar Tarefa Simples
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Implementar página inicial",
+  "description": "Criar nova homepage responsiva com hero section",
+  "status": "PENDING",
+  "priority": "HIGH",
+  "dueDate": "2025-12-15T23:59:59",
+  "projectId": 2
+}
+
+### Criar Tarefa Urgente
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Corrigir bug crítico no login",
+  "description": "Usuários não conseguem fazer login no ambiente de produção",
+  "status": "IN_PROGRESS",
+  "priority": "URGENT",
+  "dueDate": "2025-12-02T18:00:00"
+}
+
+### Criar Tarefa de Baixa Prioridade
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Atualizar documentação",
+  "description": "Revisar e atualizar README do projeto",
+  "status": "PENDING",
+  "priority": "LOW"
+}
+
+### Listar todas as Tarefas
+GET {{baseUrl}}/tasks
+
+### Buscar Tarefa por ID
+GET {{baseUrl}}/tasks/1
+
+### Listar Tarefas de um Projeto
+GET {{baseUrl}}/tasks/project/1
+
+### Filtrar Tarefas por Status (PENDING, IN_PROGRESS, COMPLETED, CANCELLED)
+GET {{baseUrl}}/tasks/status/PENDING
+
+### Listar Tarefas Ordenadas por Prioridade (Strategy Pattern)
+GET {{baseUrl}}/tasks/sorted/priority
+
+### Atualizar Tarefa
+PUT {{baseUrl}}/tasks/1
+Content-Type: application/json
+
+{
+  "title": "Implementar página inicial",
+  "description": "Criar nova homepage responsiva com hero section e CTA",
+  "status": "IN_PROGRESS",
+  "priority": "HIGH",
+  "dueDate": "2025-12-15T23:59:59"
+}
+
+### Atualizar Status da Tarefa (Dispara Observer)
+PUT {{baseUrl}}/tasks/1
+Content-Type: application/json
+
+{
+  "title": "Implementar página inicial",
+  "description": "Criar nova homepage responsiva",
+  "status": "COMPLETED",
+  "priority": "HIGH",
+  "dueDate": "2025-12-15T23:59:59"
+}
+
+### Deletar Tarefa
+DELETE {{baseUrl}}/tasks/1
+
+
+### ==================== COMENTÁRIOS ====================
+
+### Adicionar Comentário à Tarefa
+POST {{baseUrl}}/tasks/3/comments
+Content-Type: application/json
+
+{
+  "content": "Trabalho iniciado. Estimativa de conclusão: 3 dias",
+  "author": "João Silva"
+}
+
+### Adicionar outro Comentário
+POST {{baseUrl}}/tasks/1/comments
+Content-Type: application/json
+
+{
+  "content": "Design aprovado pelo cliente. Pode prosseguir com implementação.",
+  "author": "Maria Santos"
+}
+
+### Listar Comentários de uma Tarefa
+GET {{baseUrl}}/tasks/1/comments
+
+### Deletar Comentário
+DELETE {{baseUrl}}/tasks/1/comments/1
+
+
+### ==================== TESTES DE VALIDAÇÃO ====================
+
+### Tentar criar Tarefa sem título (deve falhar)
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "description": "Tarefa sem título",
+  "status": "PENDING",
+  "priority": "MEDIUM"
+}
+
+### Tentar criar Projeto sem nome (deve falhar)
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "description": "Projeto sem nome"
+}
+
+### Tentar buscar recurso inexistente (deve retornar 404)
+GET {{baseUrl}}/tasks/9999
+
+
+### ==================== FLUXO COMPLETO ====================
+
+### 1. Criar Projeto
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "name": "Sistema de Gestão Acadêmica",
+  "description": "Desenvolvimento de sistema para gerenciar matrícula de alunos"
+}
+
+### 2. Criar Tarefas no Projeto
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Modelar banco de dados",
+  "description": "Criar diagrama ER e scripts SQL",
+  "status": "PENDING",
+  "priority": "HIGH",
+  "dueDate": "2025-12-10T23:59:59",
+  "projectId": 1
+}
+
+###
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Implementar backend",
+  "description": "Desenvolver API REST com Spring Boot",
+  "status": "PENDING",
+  "priority": "HIGH",
+  "dueDate": "2025-12-20T23:59:59",
+  "projectId": 1
+}
+
+###
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+
+{
+  "title": "Desenvolver frontend",
+  "description": "Criar interface com React",
+  "status": "PENDING",
+  "priority": "MEDIUM",
+  "dueDate": "2025-12-25T23:59:59",
+  "projectId": 1
+}
+
+### 3. Ver todas as tarefas do projeto
+GET {{baseUrl}}/tasks/project/1
+
+### 4. Atualizar status da primeira tarefa
+PUT {{baseUrl}}/tasks/1
+Content-Type: application/json
+
+{
+  "title": "Modelar banco de dados",
+  "description": "Criar diagrama ER e scripts SQL",
+  "status": "COMPLETED",
+  "priority": "HIGH",
+  "dueDate": "2025-12-10T23:59:59"
+}
+
+### 5. Adicionar comentário
+POST {{baseUrl}}/tasks/2/comments
+Content-Type: application/json
+
+{
+  "content": "Iniciando implementação dos controllers",
+  "author": "Desenvolvedor Backend"
+}
+
+### 6. Ver tarefas ordenadas por prioridade
+GET {{baseUrl}}/tasks/sorted/priority
