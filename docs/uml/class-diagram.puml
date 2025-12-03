@@ -1,0 +1,210 @@
+@startuml TaskManager_ClassDiagram
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FEFEFE
+skinparam class {
+    BackgroundColor<<Singleton>> LightBlue
+    BackgroundColor<<Factory>> LightGreen
+    BackgroundColor<<Builder>> LightYellow
+    BackgroundColor<<Strategy>> LightPink
+    BackgroundColor<<Observer>> LightCyan
+}
+
+enum TaskStatus {
+    PENDING
+    IN_PROGRESS
+    COMPLETED
+    CANCELLED
+}
+
+enum Priority {
+    LOW
+    MEDIUM
+    HIGH
+    URGENT
+}
+
+class Project {
+    - id: Long
+    - name: String
+    - description: String
+    - createdAt: LocalDateTime
+    - updatedAt: LocalDateTime
+    - tasks: List<Task>
+    --
+    + addTask(task: Task): void
+    + removeTask(task: Task): void
+}
+
+class Task {
+    - id: Long
+    - title: String
+    - description: String
+    - status: TaskStatus
+    - priority: Priority
+    - dueDate: LocalDateTime
+    - createdAt: LocalDateTime
+    - updatedAt: LocalDateTime
+    - project: Project
+    - comments: List<Comment>
+    --
+    + addComment(comment: Comment): void
+}
+
+class Comment {
+    - id: Long
+    - content: String
+    - author: String
+    - createdAt: LocalDateTime
+    - task: Task
+}
+
+class TaskFactory <<Factory>> {
+    + createSimpleTask(title: String, desc: String): Task
+    + createUrgentTask(title: String, desc: String, date: LocalDateTime): Task
+    + createLowPriorityTask(title: String, desc: String): Task
+    + createTaskWithPriority(...): Task
+}
+
+class TaskBuilder <<Builder>> {
+    - task: Task
+    --
+    + withTitle(title: String): TaskBuilder
+    + withDescription(desc: String): TaskBuilder
+    + withStatus(status: TaskStatus): TaskBuilder
+    + withPriority(priority: Priority): TaskBuilder
+    + withDueDate(date: LocalDateTime): TaskBuilder
+    + withProject(project: Project): TaskBuilder
+    + build(): Task
+    {static} + builder(): TaskBuilder
+}
+
+interface TaskSortStrategy <<Strategy>> {
+    + sort(tasks: List<Task>): List<Task>
+}
+
+class SortByPriority {
+    + sort(tasks: List<Task>): List<Task>
+}
+
+class SortByDueDate {
+    + sort(tasks: List<Task>): List<Task>
+}
+
+class SortByStatus {
+    + sort(tasks: List<Task>): List<Task>
+}
+
+class SortByCreationDate {
+    + sort(tasks: List<Task>): List<Task>
+}
+
+class TaskSorter {
+    - strategy: TaskSortStrategy
+    --
+    + setStrategy(strategy: TaskSortStrategy): void
+    + sort(tasks: List<Task>): List<Task>
+    + sortByPriority(tasks: List<Task>): List<Task>
+    + sortByDueDate(tasks: List<Task>): List<Task>
+    + sortByStatus(tasks: List<Task>): List<Task>
+}
+
+interface TaskObserver <<Observer>> {
+    + onTaskCreated(task: Task): void
+    + onTaskUpdated(task: Task): void
+    + onTaskDeleted(taskId: Long): void
+    + onTaskStatusChanged(task: Task, oldStatus: String, newStatus: String): void
+}
+
+class NotificationObserver {
+    - logger: Logger
+    --
+    + onTaskCreated(task: Task): void
+    + onTaskUpdated(task: Task): void
+    + onTaskDeleted(taskId: Long): void
+    + onTaskStatusChanged(task: Task, oldStatus: String, newStatus: String): void
+}
+
+class TaskSubject {
+    - observers: List<TaskObserver>
+    --
+    + attach(observer: TaskObserver): void
+    + detach(observer: TaskObserver): void
+    + notifyTaskCreated(task: Task): void
+    + notifyTaskUpdated(task: Task): void
+    + notifyTaskDeleted(taskId: Long): void
+    + notifyTaskStatusChanged(task: Task, oldStatus: String, newStatus: String): void
+}
+
+class AppConfig <<Singleton>> {
+    - {static} INSTANCE: AppConfig
+    - appName: String
+    - version: String
+    - maxTasksPerProject: int
+    - maxCommentsPerTask: int
+    - notificationsEnabled: boolean
+    --
+    - AppConfig()
+    + {static} getInstance(): AppConfig
+    + getAppName(): String
+    + setAppName(name: String): void
+    + getVersion(): String
+}
+
+class TaskService {
+    - taskRepository: TaskRepository
+    - projectRepository: ProjectRepository
+    - taskFactory: TaskFactory
+    - taskSubject: TaskSubject
+    - taskSorter: TaskSorter
+    --
+    + createTask(taskDTO: TaskDTO): TaskDTO
+    + getAllTasks(): List<TaskDTO>
+    + getTaskById(id: Long): TaskDTO
+    + updateTask(id: Long, taskDTO: TaskDTO): TaskDTO
+    + deleteTask(id: Long): void
+    + getTasksSortedByPriority(): List<TaskDTO>
+}
+
+class ProjectService {
+    - projectRepository: ProjectRepository
+    --
+    + createProject(projectDTO: ProjectDTO): ProjectDTO
+    + getAllProjects(): List<ProjectDTO>
+    + getProjectById(id: Long): ProjectDTO
+    + updateProject(id: Long, projectDTO: ProjectDTO): ProjectDTO
+}
+
+Project "1" --> "0..*" Task : contains
+Task "1" --> "0..*" Comment : has
+Task --> TaskStatus
+Task --> Priority
+
+TaskFactory ..> Task : <<creates>>
+
+TaskBuilder ..> Task : <<builds>>
+
+TaskSortStrategy <|.. SortByPriority
+TaskSortStrategy <|.. SortByDueDate
+TaskSortStrategy <|.. SortByStatus
+TaskSortStrategy <|.. SortByCreationDate
+TaskSorter o--> TaskSortStrategy : uses
+
+TaskObserver <|.. NotificationObserver
+TaskSubject o--> "0..*" TaskObserver : notifies
+
+TaskService --> TaskFactory : uses
+TaskService --> TaskSubject : uses
+TaskService --> TaskSorter : uses
+TaskService ..> Task : manages
+ProjectService ..> Project : manages
+
+legend right
+    |<back:LightGreen>   </back>| Factory Method |
+    |<back:LightYellow>   </back>| Builder |
+    |<back:LightBlue>   </back>| Singleton |
+    |<back:LightPink>   </back>| Strategy |
+    |<back:LightCyan>   </back>| Observer |
+endlegend
+
+@enduml

@@ -1,0 +1,153 @@
+@startuml TaskManager_SequenceDiagram_US05
+
+title Diagrama de Sequência - US05: Receber Notificações (Padrão Observer)
+
+actor "Usuário" as User
+participant "TaskController" as TC
+participant "TaskService" as TS
+participant "TaskRepository" as TR
+participant "TaskSubject" as TSub
+participant "NotificationObserver" as NO
+database "Database" as DB
+
+autonumber
+
+User -> TC: POST /api/tasks\n{title, description, priority}
+activate TC
+
+TC -> TS: createTask(taskDTO)
+activate TS
+
+note right of TS: Converte DTO para Entity
+TS -> TS: convertToEntity(taskDTO)
+
+TS -> TR: save(task)
+activate TR
+
+TR -> DB: INSERT INTO tasks
+activate DB
+DB --> TR: Task persistida
+deactivate DB
+
+TR --> TS: savedTask
+deactivate TR
+
+note right of TS #LightCyan: **Padrão Observer**\nNotifica todos os observers registrados
+
+TS -> TSub: notifyTaskCreated(savedTask)
+activate TSub
+
+loop Para cada Observer
+    TSub -> NO: onTaskCreated(task)
+    activate NO
+    
+    note right of NO: Log da notificação
+    NO -> NO: logger.info("Nova tarefa: " + task.title)
+    
+    note right of NO #LightYellow: Aqui poderia:\n- Enviar Email\n- Enviar SMS\n- Push Notification\n- Webhook
+    
+    NO --> TSub: ✓
+    deactivate NO
+end
+
+TSub --> TS: Notificações enviadas
+deactivate TSub
+
+note right of TS: Converte Entity para DTO
+TS -> TS: convertToDTO(savedTask)
+
+TS --> TC: TaskDTO criada
+deactivate TS
+
+TC --> User: 201 Created\nTaskDTO
+deactivate TC
+
+== Fase 2: Atualizar Status da Tarefa ==
+
+User -> TC: PUT /api/tasks/1\n{status: "IN_PROGRESS"}
+activate TC
+
+TC -> TS: updateTask(1, taskDTO)
+activate TS
+
+TS -> TR: findById(1)
+activate TR
+
+TR -> DB: SELECT * FROM tasks WHERE id=1
+activate DB
+DB --> TR: Task encontrada
+deactivate DB
+
+TR --> TS: task (status: "PENDING")
+deactivate TR
+
+note right of TS: Armazena status antigo
+TS -> TS: oldStatus = "PENDING"
+
+note right of TS: Atualiza atributos
+TS -> TS: task.setStatus("IN_PROGRESS")
+
+TS -> TR: save(task)
+activate TR
+
+TR -> DB: UPDATE tasks SET status='IN_PROGRESS'
+activate DB
+DB --> TR: Task atualizada
+deactivate DB
+
+TR --> TS: updatedTask
+deactivate TR
+
+note right of TS #LightCyan: **Observer Pattern**\nNotifica mudança específica de status
+
+TS -> TSub: notifyTaskStatusChanged(task, "PENDING", "IN_PROGRESS")
+activate TSub
+
+loop Para cada Observer
+    TSub -> NO: onTaskStatusChanged(task, oldStatus, newStatus)
+    activate NO
+    
+    NO -> NO: logger.info("Status mudou:\nPENDING → IN_PROGRESS")
+    
+    NO --> TSub: ✓
+    deactivate NO
+end
+
+TSub --> TS: ✓
+deactivate TSub
+
+note right of TS #LightCyan: Notifica atualização geral
+
+TS -> TSub: notifyTaskUpdated(updatedTask)
+activate TSub
+
+loop Para cada Observer
+    TSub -> NO: onTaskUpdated(task)
+    activate NO
+    
+    NO -> NO: logger.info("Tarefa atualizada")
+    
+    NO --> TSub: ✓
+    deactivate NO
+end
+
+TSub --> TS: ✓
+deactivate TSub
+
+TS -> TS: convertToDTO(updatedTask)
+
+TS --> TC: TaskDTO atualizada
+deactivate TS
+
+TC --> User: 200 OK\nTaskDTO
+deactivate TC
+
+note over User, DB #LightGreen
+    **Benefícios do Observer Pattern:**
+    • Desacoplamento entre Service e sistema de notificações
+    • Múltiplos observers podem ser registrados dinamicamente
+    • Fácil adicionar novos tipos de notificação sem modificar TaskService
+    • Notificações assíncronas não bloqueiam operação principal
+end note
+
+@enduml
