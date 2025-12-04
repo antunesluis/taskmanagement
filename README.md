@@ -98,27 +98,27 @@ src/main/java/com/taskmanager/
 
 ## Padrões de Projeto Implementados
 
-1. Factory Method (Criacional)
+1. **Factory Method (Criacional)**
 
 - Localização: com.taskmanager.factory.TaskFactory
 - Propósito: Cria diferentes tipos de tarefas (simples, urgentes, baixa prioridade)
 
-2. Builder (Criacional)
+2. **Builder (Criacional)**
 
 - Localização: com.taskmanager.builder.TaskBuilder
 - Propósito: Construção fluente e flexível de objetos Task complexos
 
-3. Singleton (Criacional)
+3. **Singleton (Criacional)**
 
 - Localização: com.taskmanager.config.AppConfig
 - Propósito: Garante única instância de configuração da aplicação
 
-4. Strategy (Comportamental)
+4. **Strategy (Comportamental)**
 
 - Localização: com.taskmanager.strategy.\*
 - Propósito: Define diferentes estratégias de ordenação de tarefas (por prioridade, data, status)
 
-5. Observer (Comportamental)
+5. **Observer (Comportamental)**
 
 - Localização: com.taskmanager.observer.\*
 - Propósito: Notifica sobre eventos de tarefas (criação, atualização, mudança de status)
