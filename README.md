@@ -2,7 +2,7 @@
 
 Sistema de Gerenciamento de Tarefas e Projetos desenvolvido em Java com Spring Boot e SQLite.
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 - Java 17
 - Spring Boot 3.2.0
@@ -11,7 +11,7 @@ Sistema de Gerenciamento de Tarefas e Projetos desenvolvido em Java com Spring B
 - Lombok
 - Maven
 
-## 📦 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 src/main/java/com/taskmanager/
@@ -29,7 +29,7 @@ src/main/java/com/taskmanager/
 └── strategy/          # Padrão Strategy
 ```
 
-## 🚀 Como Executar
+## Como Executar
 
 ### Pré-requisitos
 
@@ -68,7 +68,7 @@ src/main/java/com/taskmanager/
 
 8. **A API estará disponível em**: `http://localhost:8080`
 
-## 📡 Endpoints da API
+## Endpoints da API
 
 ### Projetos
 
@@ -95,3 +95,30 @@ src/main/java/com/taskmanager/
 - `POST /api/tasks/{taskId}/comments` - Adicionar comentário
 - `GET /api/tasks/{taskId}/comments` - Listar comentários
 - `DELETE /api/tasks/{taskId}/comments/{commentId}` - Deletar comentário
+
+🎯 Padrões de Projeto Implementados
+
+1. Factory Method (Criacional)
+
+Localização: com.taskmanager.factory.TaskFactory
+Propósito: Cria diferentes tipos de tarefas (simples, urgentes, baixa prioridade)
+
+2. Builder (Criacional)
+
+Localização: com.taskmanager.builder.TaskBuilder
+Propósito: Construção fluente e flexível de objetos Task complexos
+
+3. Singleton (Criacional)
+
+Localização: com.taskmanager.config.AppConfig
+Propósito: Garante única instância de configuração da aplicação
+
+4. Strategy (Comportamental)
+
+Localização: com.taskmanager.strategy.\*
+Propósito: Define diferentes estratégias de ordenação de tarefas (por prioridade, data, status)
+
+5. Observer (Comportamental)
+
+Localização: com.taskmanager.observer.\*
+Propósito: Notifica sobre eventos de tarefas (criação, atualização, mudança de status)
