@@ -96,7 +96,7 @@ src/main/java/com/taskmanager/
 - `GET /api/tasks/{taskId}/comments` - Listar comentários
 - `DELETE /api/tasks/{taskId}/comments/{commentId}` - Deletar comentário
 
-🎯 Padrões de Projeto Implementados
+## Padrões de Projeto Implementados
 
 1. Factory Method (Criacional)
 
